@@ -1,0 +1,18 @@
+---
+- name: install mysql
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - mysql-server
+    - php7.0-mysql
+    - python-mysqldb
+
+- name: Create mysql database for WP
+  mysql_db: name={{ wp_mysql_db }} state=present
+
+- name: Create mysql user
+  mysql_user: 
+    name={{ wp_mysql_user }}
+    password={{ wp_mysql_password }}
+    priv=*.*:ALL

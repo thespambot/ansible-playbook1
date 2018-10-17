@@ -1,0 +1,71 @@
+---
+- name: install nginx
+  apt: 
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - nginx
+    - php7.0
+  become: yes
+
+- name: copy nginx virtual host with owner and permissions
+  copy:
+    src: nginx-vhost.conf
+    dest: /etc/nginx/conf.d/team-green.conf
+    owner: root
+    group: root
+  become: yes
+
+- name: copy php fpm config
+  copy:
+    src: php-fpm.conf
+    dest: /etc/php/7.0/fpm/pool.d/team-green.conf
+    owner: root
+    group: root
+  become: yes
+
+- name: Ensure public_html folder exists
+  file: 
+    path: /var/www/team-green/public_html/images
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+  #  become: yes
+  #become_method: sudo
+
+- name: copy index file
+  copy:
+    src: index.php
+    dest: /var/www/team-green/public_html/index.php
+    owner: www-data
+    group: www-data
+  become: yes
+  become_method: sudo
+
+- name: copy info.php file
+  copy:
+    src: info.php
+    dest: /var/www/team-green/public_html/info.php
+    owner: www-data
+    group: www-data
+  become: yes
+  become_method: sudo
+
+- name: copy image
+  get_url: 
+    url: https://s3.amazonaws.com/assets.milojennings.com/images/brain-shield-copy.png
+    dest: /var/www/team-green/public_html/images/brain-shield.png
+    owner: www-data
+    group: www-data
+- name: restart php-fpm
+  service:
+    name: php7.0-fpm
+    state: reloaded  
+  become: yes
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: reloaded  
+  become: yes

@@ -1,0 +1,11 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  vars: 
+    vhost_path: "/var/www/team-green"
+    web_root: "/var/www/team-green/public_html"
+  roles:
+    - appserver
+    - database
+    - wordpress
